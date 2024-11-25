@@ -1,12 +1,29 @@
 
-FROM maven:3.8-openjdk-17 AS build
-WORKDIR /app
-# kopierer koden fra utsiden inn til imaget
-COPY . .
-RUN mvn package
+# Stage 1: Build the application
+FROM maven:3.9.4-eclipse-temurin-17 AS builder
 
-FROM openjdk:17-slim AS prod
+# Set the working directory
 WORKDIR /app
-# kopierer bare jar-filen for å redusere størrelsen på imaget
-COPY --from=build /app/target/imagegenerator-0.0.1-SNAPSHOT.jar /app/imagegenerator-0.0.1-SNAPSHOT.jar
-CMD ["sh", "-c", "java -jar imagegenerator-0.0.1-SNAPSHOT.jar 'Me on top of K2'"]
+
+# Copy the Maven project files to the working directory
+COPY pom.xml .
+COPY src ./src
+
+# Build the application
+RUN mvn package -DskipTests
+
+# Stage 2: Create a minimal runtime environment
+FROM eclipse-temurin:17-jre-alpine
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the JAR file from the builder stage
+COPY --from=builder /app/target/imagegenerator-0.0.1-SNAPSHOT.jar /app/imagegenerator.jar
+
+# Set the environment variable for SQS_QUEUE_URL
+ENV SQS_QUEUE_URL=""
+ENV java-sqs-client="Me on top of K2"
+
+# Command to run the application
+ENTRYPOINT ["java", "-jar", "/app/imagegenerator.jar"]
