@@ -33,9 +33,11 @@ jobs:
           COMMIT_SHA=${{ github.sha }}
           docker build   -t ${{ secrets.DOCKERHUB_USERNAME }}/imagegenerator:${VERSION}-${COMMIT_SHA} .
 
+      - name: Tag the image with commit SHA
+        run: |
+          docker tag ${{ secrets.DOCKER_USERNAME }}/imagegenerator-client:latest ${{ secrets.DOCKER_USERNAME }}/imagegenerator-client:${{ github.sha }}
+
       - name: Push the Docker image
         run: |
-          VERSION=${{ env.VERSION }}
-          COMMIT_SHA=${{ github.sha }}
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/imagegenerator:${VERSION}
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/imagegenerator:${VERSION}-${COMMIT_SHA}
+          docker push ${{ secrets.DOCKER_USERNAME }}/imagegenerator-client:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/imagegenerator-client:${{ github.sha }}
