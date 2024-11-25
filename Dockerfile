@@ -2,7 +2,7 @@
 FROM maven:3.8-openjdk-17 AS build
 WORKDIR /app
 # kopierer koden fra utsiden inn til imaget
-COPY ./java_sqs_client .
+COPY . .
 RUN mvn package
 
 FROM openjdk:17-slim AS prod
