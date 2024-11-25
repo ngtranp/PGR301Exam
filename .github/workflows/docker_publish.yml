@@ -31,7 +31,7 @@ jobs:
         run: |
           VERSION=${{ env.VERSION }}
           COMMIT_SHA=${{ github.sha }}
-          docker build --target prod . -t ${{ secrets.DOCKERHUB_USERNAME }}/imagegenerator:${VERSION}-${COMMIT_SHA}
+          docker build   -t ${{ secrets.DOCKERHUB_USERNAME }}/imagegenerator:${VERSION}-${COMMIT_SHA} .
 
       - name: Push the Docker image
         run: |
